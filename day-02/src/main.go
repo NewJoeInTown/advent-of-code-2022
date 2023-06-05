@@ -136,8 +136,6 @@ func (o Outcome) withOther(other Shape) Shape {
 			return Rock
 		case Scissors:
 			return Paper
-		default:
-			return -1 // This line will never be reached, added to satisfy Go compiler
 		}
 	case Draw:
 		return other
@@ -147,4 +145,9 @@ func (o Outcome) withOther(other Shape) Shape {
 			return Paper
 		case Paper:
 			return Scissors
-		case Scissors
+		case Scissors:
+			return Rock
+		}
+	}
+	return Shape(-1) // Return an invalid Shape value to indicate an error
+}
