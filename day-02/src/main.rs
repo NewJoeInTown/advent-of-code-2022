@@ -11,8 +11,8 @@ fn solve_part_1(input: &str) -> u32 {
         .map(|line| {
             let (elf, me) = line.split_once(' ').unwrap();
             let elf_shape = Shape::from_str(elf).unwrap();
-            let me_shape = Shape::from_str(me).unwrap();
-            me_shape.score() + Outcome::for_me(&elf_shape, &me_shape).score()
+            let my_shape = Shape::from_str(me).unwrap();
+            elf_shape.score() + Outcome::for_me(&elf_shape, &my_shape).score()
         })
         .sum()
 }
@@ -23,8 +23,8 @@ fn solve_part_2(input: &str) -> u32 {
         .map(|line| {
             let (elf, outcome) = line.split_once(' ').unwrap();
             let elf_shape = Shape::from_str(elf).unwrap();
-            let outcome_type = Outcome::from_str(outcome).unwrap();
-            outcome_type.with_other(&elf_shape).score() + outcome_type.score()
+            let outcome_shape = Outcome::from_str(outcome).unwrap();
+            outcome_shape.with_other(&elf_shape).score() + outcome_shape.score()
         })
         .sum()
 }
@@ -101,6 +101,50 @@ impl Outcome {
                 Shape::Paper => Shape::Rock,
                 Shape::Scissors => Shape::Paper,
             },
-            Outcome::Draw => match other {
-                Shape::Rock => Shape::Rock,
-               
+            Outcome::Draw => *other,
+            Outcome::Win => match other {
+                Shape::Rock => Shape::Paper,
+                Shape::Paper => Shape::Scissors,
+                Shape::Scissors => Shape::Rock,
+            },
+        }
+    }
+
+    fn score(&self) -> u32 {
+        match self {
+            Outcome::Lose => 0,
+            Outcome::Draw => 3,
+            Outcome::Win => 6,
+        }
+    }
+}
+
+fn file(path: &str) -> String {
+    fs::read_to_string(path).unwrap().trim().to_owned()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn part_1_examples() {
+        assert_eq!(solve_part_1(&file("example_1")), 15);
+    }
+
+    #[test]
+    fn part_1_input() {
+        assert_eq!(solve_part_1(&file("input")), 15_691);
+    }
+
+    #[test]
+    fn part_2_examples() {
+        assert_eq!(solve_part_2(&file("example_2")), 12);
+    }
+
+    #[test]
+    fn part_2_input() {
+        assert_eq!(solve_part_2(&file("input")), 12_989);
+    }
+}
